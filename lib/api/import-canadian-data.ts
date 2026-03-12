@@ -13,17 +13,17 @@ export async function importCanadianUniversities() {
   // Fetch data
   const universities = await fetcher.fetchUniversityData()
 
-  // Get graduate level
-  const { data: level } = await supabase
+  // Get all program levels
+  const { data: levels } = await supabase
     .from('program_levels')
-    .select('id')
-    .eq('name', 'graduate')
-    .single()
+    .select('id, name')
 
-  if (!level) {
-    console.error('❌ Graduate level not found in database')
+  if (!levels || levels.length === 0) {
+    console.error('❌ Program levels not found in database')
     return
   }
+
+  const levelMap = new Map(levels.map(l => [l.name, l.id]))
 
   let totalImported = 0
 
@@ -78,20 +78,50 @@ export async function importCanadianUniversities() {
           continue
         }
 
+        // Determine program level based on degree type
+        let programLevel = 'undergraduate'
+        const degreeType = program.degreeType.toUpperCase()
+
+        if (degreeType.startsWith('M') || degreeType.includes('MASTER') || degreeType === 'MBA' || degreeType === 'PHD') {
+          programLevel = 'graduate'
+        } else if (degreeType === 'MBA' || degreeType === 'JD' || degreeType === 'MD') {
+          programLevel = 'professional'
+        } else if (degreeType === 'DIPLOMA' || degreeType === 'CERTIFICATE') {
+          programLevel = 'undergraduate' // Diplomas mapped to undergraduate for now
+        }
+
+        const levelId = levelMap.get(programLevel)
+        if (!levelId) {
+          console.error(`    ❌ Level not found for: ${programLevel}`)
+          continue
+        }
+
+        // Determine duration based on program type
+        let durationMonths = 48 // Default 4 years for undergrad
+        if (programLevel === 'graduate') {
+          if (degreeType === 'PHD') {
+            durationMonths = 60 // 5 years for PhD
+          } else {
+            durationMonths = 24 // 2 years for Masters
+          }
+        } else if (degreeType === 'DIPLOMA' || degreeType === 'CERTIFICATE') {
+          durationMonths = 12 // 1 year for diploma
+        }
+
         // Create program
         const { data: newProgram, error: programError } = await supabase
           .from('programs')
           .insert({
             school_id: school.id,
-            level_id: level.id,
+            level_id: levelId,
             name: program.name,
             slug: program.name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
             description: `${program.name} program at ${university.name}, specializing in ${program.field}.`,
             degree_type: program.degreeType,
             format: 'full-time',
-            duration_months: 24,
-            credit_hours: 60,
-            data_source: 'statcan',
+            duration_months: durationMonths,
+            credit_hours: programLevel === 'graduate' ? 60 : 120,
+            data_source: 'scraped',
             is_published: true
           })
           .select()

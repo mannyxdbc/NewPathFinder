@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "next lint",
     "scrape": "tsx scripts/scrape-data.ts",
-    "import:canada": "tsx scripts/import-canadian-data.ts"
+    "import:canada": "tsx scripts/import-canadian-data.ts",
+    "import:ipeds": "tsx scripts/import-ipeds-data.ts"
   },
   "repository": {
     "type": "git",
@@ -28,10 +29,12 @@
   "dependencies": {
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.99.0",
+    "@types/papaparse": "^5.5.2",
     "axios": "^1.13.6",
     "cheerio": "^1.2.0",
     "dotenv": "^17.3.1",
     "next": "^16.1.6",
+    "papaparse": "^5.5.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4"
   },
