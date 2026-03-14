@@ -13,6 +13,9 @@
     "lint": "next lint",
     "scrape": "tsx scripts/scrape-data.ts",
     "import:canada": "tsx scripts/import-canadian-data.ts",
+    "import:canada:csv": "tsx scripts/import-statcan-csv.ts",
+    "import:bc": "tsx scripts/import-bc-universities.ts",
+    "import:canada:all": "tsx scripts/import-all-canada.ts",
     "import:ipeds": "tsx scripts/import-ipeds-data.ts"
   },
   "repository": {

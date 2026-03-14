@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
+import Navigation from '@/components/Navigation'
 import { notFound } from 'next/navigation'
 
 interface ProgramDetailPageProps {
@@ -79,430 +80,324 @@ export default async function ProgramDetailPage({ params }: ProgramDetailPagePro
     : program.program_advisors ? [program.program_advisors] : []
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center text-sm text-gray-600">
-            <Link href="/" className="hover:text-indigo-600">Home</Link>
-            <span className="mx-2">/</span>
-            <Link href="/programs" className="hover:text-indigo-600">Programs</Link>
-            <span className="mx-2">/</span>
-            <span className="text-gray-900">{program.name}</span>
-          </div>
-        </div>
-      </div>
+    <>
+      <Navigation />
+      <main>
+        <div className="profile-wrap">
+          <Link href="/programs" className="back-btn" aria-label="Back to Programs">
+            ← Back to Programs
+          </Link>
 
-      {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <span className="inline-block px-3 py-1 bg-white/20 rounded-full text-sm font-medium mb-4">
-                {program.degree_type} • {program.program_levels.name}
-              </span>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">{program.name}</h1>
-              <div className="flex items-center gap-6 text-lg">
-                <span className="flex items-center">
-                  <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  {program.schools.name}
-                </span>
-                <span className="flex items-center">
-                  <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+          <div className="verified-banner">
+            <span className="verified-icon" aria-hidden="true">✓</span>
+            <span className="verified-text">Verified Program</span>
+            <span className="freshness-pill" style={{background: '#16653415', color: '#166534', border: '1px solid #16653430'}}>
+              <span className="dot" style={{background: '#166534'}} />
+              Fresh
+            </span>
+          </div>
+
+          <div className="profile-hdr">
+            <div className="profile-logo">
+              {program.schools.name.substring(0, 2).toUpperCase()}
+            </div>
+            <div className="profile-meta">
+              <div className="profile-school-name">{program.schools.name}</div>
+              <h1 className="profile-prog-name">{program.name}</h1>
+              <div className="profile-pills">
+                <span className="ppill">{program.degree_type}</span>
+                <span className="ppill">{program.program_levels.name}</span>
+                <span className="ppill accent">
                   {program.schools.city}, {program.schools.state_province}
                 </span>
+                {program.duration_months && (
+                  <span className="ppill">{program.duration_months} months</span>
+                )}
+                {tuitionData?.currency && (
+                  <span className="ppill">{tuitionData.currency}</span>
+                )}
               </div>
             </div>
-            {tuitionData?.total_tuition && (
-              <div className="hidden lg:block text-right">
-                <p className="text-sm opacity-90 mb-1">Tuition</p>
-                <p className="text-3xl font-bold">
+            <div className="profile-actions">
+              {tuitionData?.total_tuition && (
+                <button className="act-btn act-outline" aria-label={`Total tuition: ${tuitionData.total_tuition.toLocaleString()} ${tuitionData.currency || 'USD'}`}>
                   ${tuitionData.total_tuition.toLocaleString()}
-                </p>
-                <p className="text-sm opacity-75">{tuitionData.currency || 'USD'}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Column */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Program Overview */}
-            {program.description && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                  <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Program Overview
-                </h2>
-                <p className="text-gray-700 leading-relaxed text-lg">{program.description}</p>
-              </div>
-            )}
-
-            {/* Key Highlights */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-                Key Highlights
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Duration</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-900">
-                      {program.duration_months ? `${program.duration_months} months` : 'Varies'}
-                    </p>
-                    {program.duration_semesters && (
-                      <p className="text-sm text-gray-600">{program.duration_semesters} semesters</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 h-10 w-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Format</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-900 capitalize">
-                      {program.format || 'Full-time'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Credit Hours</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-900">
-                      {program.credit_hours || 'N/A'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start p-4 bg-gray-50 rounded-lg">
-                  <div className="flex-shrink-0 h-10 w-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-500">Program Level</p>
-                    <p className="mt-1 text-lg font-semibold text-gray-900 capitalize">
-                      {program.program_levels.name}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Program Details */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Program Details</h2>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Program Level</p>
-                  <p className="font-semibold text-gray-900 capitalize">{program.program_levels.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Format</p>
-                  <p className="font-semibold text-gray-900 capitalize">{program.format || 'N/A'}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Duration</p>
-                  <p className="font-semibold text-gray-900">
-                    {program.duration_months ? `${program.duration_months} months` : 'N/A'}
-                    {program.duration_semesters && ` (${program.duration_semesters} semesters)`}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">Credit Hours</p>
-                  <p className="font-semibold text-gray-900">{program.credit_hours || 'N/A'}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Admission Requirements */}
-            {admissionReqs && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                  <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Admission Requirements
-                </h2>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {admissionReqs.gpa_minimum && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Minimum GPA: {admissionReqs.gpa_minimum}</span>
-                      </div>
-                    )}
-                    {admissionReqs.gpa_average && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Average GPA: {admissionReqs.gpa_average}</span>
-                      </div>
-                    )}
-                    {admissionReqs.gmat_gre_required && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>GMAT/GRE Required</span>
-                      </div>
-                    )}
-                    {admissionReqs.gmat_average && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Average GMAT: {admissionReqs.gmat_average}</span>
-                      </div>
-                    )}
-                    {admissionReqs.gre_average && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Average GRE: {admissionReqs.gre_average}</span>
-                      </div>
-                    )}
-                    {admissionReqs.work_exp_years_min && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Minimum Work Experience: {admissionReqs.work_exp_years_min} years</span>
-                      </div>
-                    )}
-                    {admissionReqs.work_exp_years_avg && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Average Work Experience: {admissionReqs.work_exp_years_avg} years</span>
-                      </div>
-                    )}
-                    {admissionReqs.english_test_required && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>English Test Required: {admissionReqs.english_test_types || 'TOEFL/IELTS'}</span>
-                      </div>
-                    )}
-                    {admissionReqs.english_min_score && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Minimum Score: {admissionReqs.english_min_score}</span>
-                      </div>
-                    )}
-                    {admissionReqs.lor_count && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>{admissionReqs.lor_count} Letters of Recommendation</span>
-                      </div>
-                    )}
-                    {admissionReqs.sop_required && (
-                      <div className="flex items-center">
-                        <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span>Statement of Purpose Required{admissionReqs.sop_word_limit && ` (${admissionReqs.sop_word_limit} words)`}</span>
-                      </div>
-                    )}
-                    {admissionReqs.other_requirements && (
-                      <div className="col-span-2">
-                        <div className="flex items-start">
-                          <svg className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          <span className="text-sm">{admissionReqs.other_requirements}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Program Advisors */}
-            {advisors && advisors.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                  <svg className="w-6 h-6 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  Program Advisors
-                </h2>
-                <div className="space-y-4">
-                  {advisors.map((advisor: any, idx: number) => (
-                    <div key={idx} className="border-l-4 border-indigo-500 pl-4">
-                      <p className="font-semibold text-gray-900">{advisor.name}</p>
-                      {advisor.title && <p className="text-sm text-gray-600">{advisor.title}</p>}
-                      <div className="mt-2 flex gap-4 text-sm text-gray-600">
-                        {advisor.email && (
-                          <a href={`mailto:${advisor.email}`} className="hover:text-indigo-600">
-                            📧 {advisor.email}
-                          </a>
-                        )}
-                        {advisor.phone && <span>📞 {advisor.phone}</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Tuition Card */}
-            {tuitionData && (
-              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Tuition & Fees
-                </h3>
-                <div className="space-y-4">
-                  {tuitionData.total_tuition && (
-                    <div className="pb-4 border-b">
-                      <p className="text-sm text-gray-600 mb-1">Total Program Cost</p>
-                      <p className="text-3xl font-bold text-indigo-600">
-                        ${tuitionData.total_tuition.toLocaleString()}
-                      </p>
-                      <p className="text-sm text-gray-500">{tuitionData.currency || 'USD'}</p>
-                    </div>
-                  )}
-                  {tuitionData.semester_1_tuition && (
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Semester 1</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        ${tuitionData.semester_1_tuition.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {tuitionData.semester_2_tuition && (
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Semester 2</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        ${tuitionData.semester_2_tuition.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {tuitionData.fees_per_semester && (
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Fees per Semester</p>
-                      <p className="text-lg font-semibold text-gray-900">
-                        ${tuitionData.fees_per_semester.toLocaleString()}
-                      </p>
-                    </div>
-                  )}
-                  {tuitionData.academic_year && (
-                    <p className="text-xs text-gray-500 pt-2 border-t">
-                      Academic Year: {tuitionData.academic_year}
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                {program.admissions_url && (
-                  <a
-                    href={program.admissions_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full px-4 py-2 bg-indigo-600 text-white text-center rounded-lg hover:bg-indigo-700"
-                  >
-                    Apply Now
-                  </a>
-                )}
-                {program.schools.website && (
-                  <a
-                    href={program.schools.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full px-4 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50"
-                  >
-                    Visit Website
-                  </a>
-                )}
-                <button className="w-full px-4 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50">
-                  Save Program
                 </button>
-                <Link
-                  href={`/compare?programs=${program.id}`}
-                  className="block w-full px-4 py-2 border border-gray-300 text-gray-700 text-center rounded-lg hover:bg-gray-50"
-                >
-                  Add to Compare
-                </Link>
+              )}
+              <button className="act-btn act-primary" aria-label="Save program">Save</button>
+              <Link href={`/compare?programs=${program.id}`} className="act-btn act-teal" aria-label="Compare this program">
+                Compare
+              </Link>
+            </div>
+          </div>
+
+          {program.description && (
+            <div className="description-box">
+              <p className="description-text">{program.description}</p>
+            </div>
+          )}
+
+          <div className="highlights-box">
+            <div className="data-section-title">Program Highlights</div>
+            <div className="highlight-item">
+              <span className="highlight-icon">📚</span>
+              <span className="highlight-text">
+                <strong>Duration:</strong> {program.duration_months ? `${program.duration_months} months` : 'N/A'}
+                {program.duration_semesters && ` (${program.duration_semesters} semesters)`}
+              </span>
+            </div>
+            {program.format && (
+              <div className="highlight-item">
+                <span className="highlight-icon">💻</span>
+                <span className="highlight-text">
+                  <strong>Format:</strong> {program.format}
+                </span>
+              </div>
+            )}
+            {program.credit_hours && (
+              <div className="highlight-item">
+                <span className="highlight-icon">🎓</span>
+                <span className="highlight-text">
+                  <strong>Credit Hours:</strong> {program.credit_hours}
+                </span>
+              </div>
+            )}
+            {tuitionData?.total_tuition && (
+              <div className="highlight-item">
+                <span className="highlight-icon">💰</span>
+                <span className="highlight-text">
+                  <strong>Total Tuition:</strong> ${tuitionData.total_tuition.toLocaleString()} {tuitionData.currency || 'USD'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="section-grid">
+            <div className="data-section">
+              <div className="data-section-title">Program Basics</div>
+              <div className="data-row">
+                <span className="dk">Duration</span>
+                <span className="dv">
+                  {program.duration_months ? `${program.duration_months} months` : 'N/A'}
+                </span>
+              </div>
+              <div className="data-row">
+                <span className="dk">Semesters</span>
+                <span className="dv">{program.duration_semesters || 'N/A'}</span>
+              </div>
+              <div className="data-row">
+                <span className="dk">Format</span>
+                <span className="dv">{program.format || 'N/A'}</span>
+              </div>
+              <div className="data-row">
+                <span className="dk">Credit Hours</span>
+                <span className="dv">{program.credit_hours || 'N/A'}</span>
               </div>
             </div>
 
-            {/* School Info */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">School Information</h3>
-              <div className="space-y-2 text-sm">
-                <p className="font-semibold text-gray-900">{program.schools.name}</p>
-                <p className="text-gray-600">
-                  {program.schools.city}, {program.schools.state_province}
-                  <br />
-                  {program.schools.country === 'CA' ? 'Canada' : program.schools.country}
-                </p>
-                {program.schools.website && (
-                  <a
-                    href={program.schools.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-indigo-600 hover:text-indigo-800"
-                  >
-                    Visit School Website →
-                  </a>
+            {tuitionData && (
+              <div className="data-section">
+                <div className="data-section-title">Tuition & Fees</div>
+                {tuitionData.total_tuition && (
+                  <div className="data-row">
+                    <span className="dk">Total Cost</span>
+                    <span className="dv accent">
+                      ${tuitionData.total_tuition.toLocaleString()} {tuitionData.currency || 'USD'}
+                    </span>
+                  </div>
+                )}
+                {tuitionData.semester_1_tuition && (
+                  <div className="data-row">
+                    <span className="dk">Semester 1</span>
+                    <span className="dv">${tuitionData.semester_1_tuition.toLocaleString()}</span>
+                  </div>
+                )}
+                {tuitionData.semester_2_tuition && (
+                  <div className="data-row">
+                    <span className="dk">Semester 2</span>
+                    <span className="dv">${tuitionData.semester_2_tuition.toLocaleString()}</span>
+                  </div>
+                )}
+                {tuitionData.fees_per_semester && (
+                  <div className="data-row">
+                    <span className="dk">Fees/Semester</span>
+                    <span className="dv">${tuitionData.fees_per_semester.toLocaleString()}</span>
+                  </div>
+                )}
+                {tuitionData.academic_year && (
+                  <div className="data-row">
+                    <span className="dk">Academic Year</span>
+                    <span className="dv">{tuitionData.academic_year}</span>
+                  </div>
                 )}
               </div>
+            )}
+          </div>
+
+          <div className="section-grid">
+            {admissionReqs && (
+              <div className="data-section">
+                <div className="data-section-title">Admission Stats</div>
+                {admissionReqs.gpa_average && (
+                  <div className="data-row">
+                    <span className="dk">Average GPA</span>
+                    <span className="dv">{admissionReqs.gpa_average}</span>
+                  </div>
+                )}
+                {admissionReqs.gmat_average && (
+                  <div className="data-row">
+                    <span className="dk">Average GMAT</span>
+                    <span className="dv">{admissionReqs.gmat_average}</span>
+                  </div>
+                )}
+                {admissionReqs.gre_average && (
+                  <div className="data-row">
+                    <span className="dk">Average GRE</span>
+                    <span className="dv">{admissionReqs.gre_average}</span>
+                  </div>
+                )}
+                {admissionReqs.work_exp_years_avg && (
+                  <div className="data-row">
+                    <span className="dk">Avg Work Experience</span>
+                    <span className="dv">{admissionReqs.work_exp_years_avg} years</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {admissionReqs && (
+              <div className="data-section">
+                <div className="data-section-title">Application Requirements</div>
+                {admissionReqs.gpa_minimum && (
+                  <div className="data-row">
+                    <span className="dk">Minimum GPA</span>
+                    <span className="dv">{admissionReqs.gpa_minimum}</span>
+                  </div>
+                )}
+                {admissionReqs.gmat_gre_required && (
+                  <div className="data-row">
+                    <span className="dk">GMAT/GRE</span>
+                    <span className="dv">Required</span>
+                  </div>
+                )}
+                {admissionReqs.work_exp_years_min && (
+                  <div className="data-row">
+                    <span className="dk">Min Work Exp</span>
+                    <span className="dv">{admissionReqs.work_exp_years_min} years</span>
+                  </div>
+                )}
+                {admissionReqs.english_test_required && (
+                  <div className="data-row">
+                    <span className="dk">English Test</span>
+                    <span className="dv">{admissionReqs.english_test_types || 'TOEFL/IELTS'}</span>
+                  </div>
+                )}
+                {admissionReqs.english_min_score && (
+                  <div className="data-row">
+                    <span className="dk">Min Score</span>
+                    <span className="dv">{admissionReqs.english_min_score}</span>
+                  </div>
+                )}
+                {admissionReqs.lor_count && (
+                  <div className="data-row">
+                    <span className="dk">Letters of Rec</span>
+                    <span className="dv">{admissionReqs.lor_count}</span>
+                  </div>
+                )}
+                {admissionReqs.sop_required && (
+                  <div className="data-row">
+                    <span className="dk">Statement of Purpose</span>
+                    <span className="dv">
+                      Required{admissionReqs.sop_word_limit && ` (${admissionReqs.sop_word_limit} words)`}
+                    </span>
+                  </div>
+                )}
+                {admissionReqs.other_requirements && (
+                  <div className="data-row">
+                    <span className="dk">Other</span>
+                    <span className="dv">{admissionReqs.other_requirements}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {advisors && advisors.length > 0 && (
+            <>
+              <div className="data-section-title" style={{marginTop: '2rem'}}>Admissions Contact</div>
+              {advisors.map((advisor: any, idx: number) => (
+                <div key={idx} className="advisor-card">
+                  <div className="advisor-left">
+                    <div className="advisor-name">{advisor.name}</div>
+                    <div className="advisor-role">{advisor.title || 'Program Advisor'}</div>
+                    <div className="advisor-contact">
+                      {advisor.email && (
+                        <a href={`mailto:${advisor.email}`} className="advisor-email" aria-label={`Email ${advisor.name}`}>
+                          {advisor.email}
+                        </a>
+                      )}
+                      {advisor.phone && <div className="advisor-phone">{advisor.phone}</div>}
+                    </div>
+                  </div>
+                  {program.admissions_url && (
+                    <a
+                      href={program.admissions_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="advisor-link"
+                      aria-label="Apply to this program"
+                    >
+                      Apply Now →
+                    </a>
+                  )}
+                </div>
+              ))}
+            </>
+          )}
+
+          {program.schools.website && (
+            <div className="advisor-card">
+              <div className="advisor-left">
+                <div className="advisor-name">School Information</div>
+                <div className="advisor-role">{program.schools.name}</div>
+                <div className="advisor-contact">
+                  <div className="advisor-phone">
+                    {program.schools.city}, {program.schools.state_province}
+                    {' • '}
+                    {program.schools.country === 'CA' ? 'Canada' : program.schools.country}
+                  </div>
+                </div>
+              </div>
+              <a
+                href={program.schools.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="advisor-link"
+                aria-label={`Visit ${program.schools.name} website`}
+              >
+                Visit Website →
+              </a>
+            </div>
+          )}
+
+          <div className="data-section" style={{marginTop: '2rem'}}>
+            <div className="data-section-title">Tags</div>
+            <div style={{display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem'}}>
+              {program.degree_type && <span className="ptag">{program.degree_type}</span>}
+              {program.program_levels?.name && <span className="ptag">{program.program_levels.name}</span>}
+              {program.format && <span className="ptag">{program.format}</span>}
+              {program.schools.country && (
+                <span className="ptag">
+                  {program.schools.country === 'CA' ? 'Canada' : program.schools.country}
+                </span>
+              )}
+              {program.schools.state_province && (
+                <span className="ptag">{program.schools.state_province}</span>
+              )}
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </main>
+    </>
   )
 }
